@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mono-analysis
+  namespace: nsp-dev
+  labels:
+    app: mono-analysis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mono-analysis
+  template:
+    metadata:
+      labels:
+        app: mono-analysis
+    spec:
+      containers:
+      - name: mono-analysis
+        image: 021891578267.dkr.ecr.ap-southeast-1.amazonaws.com/mono-analysis:v2
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "25m"
+          limits:
+            memory: "40Mi"
+            cpu: "25m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-mono-analysis
+  namespace: nsp-dev
+  labels:
+    app: svc-mono-analysis
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+      app: mono-analysis

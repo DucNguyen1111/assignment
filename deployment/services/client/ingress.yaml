@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: http-gateway-client
+  namespace: nsp-dev
+spec:
+  selector:
+    istio: istio-ingressgateway-client
+  servers:
+  - hosts:
+    - '*'
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: virtualservice-client
+  namespace: nsp-dev
+spec:
+  hosts:
+    - '*'
+  gateways:
+    - http-gateway-client
+  http:
+    - route:
+      - destination:
+          host: svc-mono-client
+          port:
+            number: 80

@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mono-image
+  namespace: nsp-dev
+  labels:
+    app: mono-image
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mono-image
+  template:
+    metadata:
+      labels:
+        app: mono-image
+    spec:
+      containers:
+      - name: mono-image
+        image: 021891578267.dkr.ecr.ap-southeast-1.amazonaws.com/mono-image:v2
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "25m"
+          limits:
+            memory: "40Mi"
+            cpu: "25m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-mono-image
+  namespace: nsp-dev
+  labels:
+    app: svc-mono-image
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+      app: mono-image
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mono-image
+  namespace: nsp-dev
+  labels:
+    app: mono-image
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mono-image
+  template:
+    metadata:
+      labels:
+        app: mono-image
+    spec:
+      containers:
+      - name: mono-image
+        image: 021891578267.dkr.ecr.ap-southeast-1.amazonaws.com/mono-image:v1
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "25m"
+          limits:
+            memory: "40Mi"
+            cpu: "25m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-mono-image
+  namespace: nsp-dev
+  labels:
+    app: svc-mono-image
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+      app: mono-image

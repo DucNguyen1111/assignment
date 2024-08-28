@@ -1,0 +1,86 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-pv-claim
+  namespace: nsp-redis
+  labels:
+    app: redis
+spec:
+  storageClassName: ebs-sc
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: redis-pv-volume
+  namespace: nsp-redis
+  labels:
+    type: amazonEBS
+    app: redis
+spec:
+  storageClassName: ebs-sc
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: nsp-redis
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    protected-mode no
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: nsp-redis
+spec:
+  selector:
+    app: redis
+  ports:
+  - name: redis
+    port: 6379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: nsp-redis
+spec:
+  serviceName: redis
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.0
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+            - name: redis-data
+              mountPath: /usr/local/etc/redis/redis.conf
+              subPath: redis.conf
+          command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:

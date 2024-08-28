@@ -1,0 +1,65 @@
+name: Deploy Client
+on:
+  pull_request:
+    paths:
+      - apps/client/**
+      - deployment/services/client/**
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: 'ap-southeast-1'
+      EKS_CLUSTER_NAME: 'eks-cluster'
+      ECR_URI: '021891578267.dkr.ecr.ap-southeast-1.amazonaws.com/mono-client'
+    
+    steps:
+      - name: Set short git commit SHA
+        id: commit
+        uses: prompt/actions-commit-hash@v2
+
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{env.AWS_REGION}}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mono-client
+          IMAGE_TAG: ${{ steps.commit.outputs.short }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f apps/client/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Update kube config
+        run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      
+      - name: update manifest file image tag
+        run: |
+          wget -q https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64
+          sudo mv yq_linux_amd64 /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          yq e -i '.spec.template.spec.containers[0].image |= "${{ steps.build-image.outputs.image }}"' 'deployment/services/client/deployment.yaml'
+      
+      - name: commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url --push origin https://github.com/DucNguyen1111/mono.git
+          git checkout -b client-release-${{ github.sha }}
+          git add .
+          git commit -m "Release client"
+          git push origin HEAD

@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: client-application
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=true
+    argocd-image-updater.argoproj.io/image-alias.force-update: 'true'
+    argocd-image-updater.argoproj.io/image-alias.update-strategy: latest
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DucNguyen1111/mono.git
+    path: deployment/services/client
+    targetRevision: feat/update_docker_build
+    
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: nsp-dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: image-service-application
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=true
+    argocd-image-updater.argoproj.io/image-alias.force-update: 'true'
+    argocd-image-updater.argoproj.io/image-alias.update-strategy: latest
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DucNguyen1111/mono.git
+    path: deployment/services/image-service
+    targetRevision: feat/update_docker_build
+    
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: nsp-dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: analysis-service-application
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=true
+    argocd-image-updater.argoproj.io/image-alias.force-update: 'true'
+    argocd-image-updater.argoproj.io/image-alias.update-strategy: latest
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DucNguyen1111/mono.git
+    path: deployment/services/analysis-service
+    targetRevision: feat/update_docker_build
+    
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: nsp-dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

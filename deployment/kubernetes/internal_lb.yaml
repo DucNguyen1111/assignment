@@ -1,0 +1,41 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  profile: default # https://istio.io/latest/docs/setup/additional-setup/config-profiles/
+  components:
+    ingressGateways:
+      - name: istio-ingressgateway-adminer
+        enabled: true
+        label:
+          istio: istio-ingressgateway-adminer
+        k8s:
+          serviceAnnotations:
+            # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      - name: istio-ingressgateway-argocd
+        enabled: true
+        label:
+          istio: istio-ingressgateway-argocd
+        k8s:
+          serviceAnnotations:
+            # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      - name: istio-ingressgateway-client
+        enabled: true
+        label:
+          istio: istio-ingressgateway-client
+        k8s:
+          serviceAnnotations:
+            # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      - name: istio-ingressgateway-image
+        enabled: true
+        label:
+          istio: istio-ingressgateway-image
+        k8s:
+          serviceAnnotations:
+            # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      - name: istio-ingressgateway-analysis
+        enabled: true
+        label:
+          istio: istio-ingressgateway-analysis
+        k8s:
+          serviceAnnotations:
+            # service.beta.kubernetes.io/azure-load-balancer-internal: "true"

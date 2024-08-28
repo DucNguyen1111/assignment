@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mono-client
+  namespace: nsp-dev
+  labels:
+    app: mono-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mono-client
+  template:
+    metadata:
+      labels:
+        app: mono-client
+    spec:
+      containers:
+      - name: mono-client
+        image: 021891578267.dkr.ecr.ap-southeast-1.amazonaws.com/mono-client:v2
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "25m"
+          limits:
+            memory: "40Mi"
+            cpu: "25m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-mono-client
+  namespace: nsp-dev
+  labels:
+    app: svc-mono-client
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+      app: mono-client

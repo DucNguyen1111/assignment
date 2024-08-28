@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer
+  namespace: nsp-adminer
+  labels:
+    app: adminer
+    group: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminer
+  template:
+    metadata:
+      labels:
+        app: adminer
+        group: db
+    spec:
+      containers:
+        - name: adminer
+          image: adminer:4.7.6-standalone
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ADMINER_DESIGN
+              value: pepa-linha
+            - name: ADMINER_DEFAULT_SERVER
+              value: postgres
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer
+  namespace: nsp-adminer
+  labels: 
+    group: db
+spec:
+  selector:
+    app: adminer
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: http-gateway-adminer
+  namespace: nsp-adminer
+spec:
+  selector:
+    istio: istio-ingressgateway-adminer
+  servers:
+  - hosts:
+    - '*'
+    port:
+      number: 80
+      name: http
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: virtualservice-adminer
+  namespace: nsp-adminer
+spec:
+  hosts:
+    - '*'
+  gateways:
+    - http-gateway-adminer
+  http:
+    - route:
+      - destination:
+          host: adminer
+          port:
+            number: 8080

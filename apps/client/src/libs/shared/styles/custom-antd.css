@@ -1,0 +1,48 @@
+.ant-btn-primary:not(:disabled):not(.ant-btn-disabled),
+.ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: #1677ff;
+}
+
+.ant-upload {
+    width: 100%;
+}
+
+.ant-upload-wrapper .ant-upload-list .ant-upload-list-item {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.ant-input-group-addon {
+    border: 1px solid #d9d9d9 !important;
+}
+
+.ant-input-search-button {
+    border: none;
+}
+
+.ant-select-single .ant-select-selector .ant-select-selection-search {
+    inset-inline-start: 0px;
+    inset-inline-end: 0px;
+}
+
+.ant-popover-content {
+    margin: 0px auto;
+    width: 60%;
+}
+
+.popup-confirm-logout .ant-popover-content {
+    width: 100%;
+}
+
+.is-add-column .ant-table-thead tr th {
+    border-color: #d9d9d9;
+    color: rgba(0, 0, 0, 0.25);
+    box-shadow: none;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.ant-switch:not(.ant-switch-checked) {
+    background: rgba(0, 0, 0, 0.45);
+}
